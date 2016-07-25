@@ -1,7 +1,6 @@
-package info.motteke.annotation_mapper;
+package info.motteke.annotation_mapper.internal.desc.jsr269;
 
 import info.motteke.annotation_mapper.errors.Warnings;
-import info.motteke.annotation_mapper.internal.desc.jsr269.CompositeProcessor;
 import info.motteke.annotation_mapper.typical.Flat;
 
 import org.seasar.aptina.unit.AptinaTestCase;
@@ -21,11 +20,24 @@ public class CompositeProcessorTest extends AptinaTestCase {
 
         compile();
 
-        assertEqualsGeneratedSourceWithResource("info/motteke/annotation_mapper/typical/FlatMapper", "info.motteke.annotation_mapper.typical.FlatMapper");
+        assertGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper");
     }
 
     public void test_warnings() throws Exception {
         addCompilationUnit(Warnings.class);
         compile();
+    }
+
+    /**
+     * 生成されたコードが想定と一致しているかを検証します。
+     *
+     * @param fqn 生成されたコードのFully Qualified Name
+     *
+     * @throws Exception
+     */
+    private void assertGeneratedSource(String fqn) throws Exception {
+        String resource = fqn.replaceAll("\\.", "/");
+
+        assertEqualsGeneratedSourceWithResource(resource, fqn);
     }
 }

@@ -16,9 +16,4 @@ public class Warnings {
     public int get() {
         return 0;
     }
-
-    @Field
-    public String getId() {
-        return "";
-    }
 }

@@ -37,7 +37,7 @@ public @interface Mapper {
          *
          * @return
          */
-        public String property() default "";
+        public String property();
     }
 
     /**

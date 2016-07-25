@@ -1,0 +1,67 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+
+// 変数定義
+def javaVersion = "1.6"
+def defaultEncoding = "UTF-8"
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.seasar.org/maven2"
+    }
+}
+
+configurations {
+    all*.exclude group: "commons-logging"
+}
+
+dependencies {
+    testCompile (
+        "junit:junit:4.12",
+        "org.seasar.aptina:aptina-unit:1.0.0",
+        "com.google.googlejavaformat:google-java-format:1.0",
+    )
+}
+
+javadoc {
+    options {
+        encoding = defaultEncoding
+        docEncoding = defaultEncoding
+        charSet = defaultEncoding
+    }
+}
+
+eclipse {
+    project {
+        file {
+            withXml {
+                def resources = it.asNode().appendNode("filteredResources")
+                def random = new Random()
+                def create = { parent, type, arguments ->
+                    def filter = parent.appendNode("filter")
+                    filter.appendNode("id", System.currentTimeMillis() + random.nextInt())
+                    filter.appendNode("type", type)
+                    filter.appendNode("name", "")
+
+                    def matcher = filter.appendNode("matcher")
+                    matcher.appendNode("id", "org.eclipse.ui.ide.multiFilter")
+                    matcher.appendNode("arguments", arguments)
+                }
+
+                create resources, 10, "1.0-name-matches-false-false-gradle"
+                create resources,  6, '1.0-name-matches-false-false-gradlew*'
+            }
+        }
+    }
+}
+
+eclipseClasspath.dependsOn += cleanEclipseClasspath
+eclipseProject.dependsOn += cleanEclipseProject
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.12"
+}

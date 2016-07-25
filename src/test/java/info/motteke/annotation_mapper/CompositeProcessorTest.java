@@ -21,9 +21,7 @@ public class CompositeProcessorTest extends AptinaTestCase {
 
         compile();
 
-        String source = getGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper");
-
-        System.out.println(source);
+        assertEqualsGeneratedSourceWithResource("info/motteke/annotation_mapper/typical/FlatMapper", "info.motteke.annotation_mapper.typical.FlatMapper");
     }
 
     public void test_warnings() throws Exception {

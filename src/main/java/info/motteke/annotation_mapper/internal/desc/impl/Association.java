@@ -3,6 +3,7 @@ package info.motteke.annotation_mapper.internal.desc.impl;
 import info.motteke.annotation_mapper.internal.desc.IAssociation;
 import info.motteke.annotation_mapper.internal.desc.IField;
 import info.motteke.annotation_mapper.internal.desc.IMapper;
+import info.motteke.annotation_mapper.internal.desc.IMessage;
 import info.motteke.annotation_mapper.internal.desc.IProperty;
 import info.motteke.annotation_mapper.internal.desc.IType;
 import info.motteke.annotation_mapper.internal.utils.MultiValueMap;
@@ -26,13 +27,33 @@ public class Association implements IAssociation {
 
     private final Association parent;
 
+    private boolean error;
+
     public Association(IMapper mapper) {
         this(mapper.getTargetType(), "", null);
 
         IType sourceType = mapper.getSourceType();
 
         for (IField field : mapper.getFields()) {
-            IProperty source = sourceType.getProperty(field.source().get());
+            String sourceName = field.source().get();
+
+            if (sourceName == null) {
+                IMessage message = Message.get().unreadableSource();
+                field.getNotifier().error(message);
+                error = true;
+
+                continue;
+            }
+
+            IProperty source = sourceType.getProperty(sourceName);
+            if (source == null) {
+                IMessage message = Message.get().noSuchGetter(sourceType.getName(), sourceName);
+                field.getNotifier().error(message);
+                error = true;
+
+                continue;
+            }
+
             String path = field.property().get();
 
             append(this, source, field, path.split("\\."), 0);
@@ -55,7 +76,9 @@ public class Association implements IAssociation {
             IProperty target = getProperty(association.type, name);
 
             if (target == null) {
-                field.getNotifier().error("そんなフィールドはない");
+                IMessage message = Message.get().noSuchSetter(association.type.getName(), name);
+                field.getNotifier().error(message);
+                error = true;
                 return;
             }
 
@@ -71,7 +94,9 @@ public class Association implements IAssociation {
         Association next = association.getChild(name);
 
         if (next == null) {
-            field.getNotifier().error("そんなフィールドはない");
+            IMessage message = Message.get().noSuchGetter(association.type.getName(), name);
+            field.getNotifier().error(message);
+            error = true;
             return;
         }
 
@@ -133,5 +158,20 @@ public class Association implements IAssociation {
     @Override
     public IAssociation getParent() {
         return parent;
+    }
+
+    @Override
+    public boolean hasError() {
+        if (this.error) {
+            return true;
+        }
+
+        for (IAssociation child : associations) {
+            if (child.hasError()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

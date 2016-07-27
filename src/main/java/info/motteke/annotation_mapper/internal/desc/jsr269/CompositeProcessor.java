@@ -1,6 +1,7 @@
 package info.motteke.annotation_mapper.internal.desc.jsr269;
 
 import info.motteke.annotation_mapper.internal.build.MapperBuilder;
+import info.motteke.annotation_mapper.internal.desc.IAssociation;
 import info.motteke.annotation_mapper.internal.desc.IMapper;
 import info.motteke.annotation_mapper.internal.desc.impl.Association;
 import info.motteke.annotation_mapper.internal.utils.jsr269.BeanUtils;
@@ -28,10 +29,15 @@ public class CompositeProcessor extends AbstractProcessor {
         for (TypeElement typeElement : annotations) {
             for (Element element : roundEnv.getElementsAnnotatedWith(typeElement)) {
                 IMapper mapper = new Jsr269Mapper(processingEnv, element);
+                IAssociation association = new Association(mapper);
+
+                if (association.hasError()) {
+                    continue;
+                }
 
                 MapperBuilder builder = new MapperBuilder(processingEnv);
                 builder.setElement(element);
-                builder.setAssociation(new Association(mapper));
+                builder.setAssociation(association);
                 builder.build();
             }
         }

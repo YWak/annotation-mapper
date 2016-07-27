@@ -22,21 +22,21 @@ public class AnnotationErrorNotifier implements IErrorNotifier {
     }
 
     @Override
-    public void info(String message) {
+    public void info(Object message) {
         print(Kind.NOTE, message);
     }
 
     @Override
-    public void warn(String message) {
+    public void warn(Object message) {
         print(Kind.WARNING, message);
     }
 
     @Override
-    public void error(String message) {
+    public void error(Object message) {
         print(Kind.ERROR, message);
     }
 
-    private void print(Kind kind, String message) {
-        env.getMessager().printMessage(kind, message, element, annotation);
+    private void print(Kind kind, Object message) {
+        env.getMessager().printMessage(kind, message.toString(), element, annotation);
     }
 }

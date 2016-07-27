@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface IAssociation {
 
-    String getName();
+    public String getName();
 
     public IType getType();
 
@@ -16,4 +16,6 @@ public interface IAssociation {
     public List<IAssociation> getAssociations();
 
     public IAssociation getParent();
+
+    public boolean hasError();
 }

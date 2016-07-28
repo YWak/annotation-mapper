@@ -9,6 +9,7 @@ public class CompositeProcessorTest extends AptinaTestCase {
 
     protected void setUp() throws Exception {
         setCharset("UTF-8");
+        addOption("-source", "1.6");
         addSourcePath("src/test/java");
 
         CompositeProcessor processor = new CompositeProcessor();
@@ -20,12 +21,15 @@ public class CompositeProcessorTest extends AptinaTestCase {
 
         compile();
 
+        System.out.println(getGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper"));
         assertGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper");
     }
 
     public void test_warnings() throws Exception {
         addCompilationUnit(Warnings.class);
         compile();
+
+        assertFalse(getCompiledResult());
     }
 
     /**

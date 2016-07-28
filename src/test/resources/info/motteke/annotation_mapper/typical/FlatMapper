@@ -47,8 +47,8 @@ public final class FlatMapper {
             // copy values
             o1.id = curr.userId;
             o1.name = curr.getUserName();
-            o2.name = curr.getProjectName();
             o2.id = curr.projectId;
+            o2.name = curr.getProjectName();
             o3.id = curr.userId;
             o3.name = curr.getUserName();
             prev = curr;

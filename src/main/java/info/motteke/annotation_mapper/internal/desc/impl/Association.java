@@ -1,17 +1,20 @@
 package info.motteke.annotation_mapper.internal.desc.impl;
 
+import info.motteke.annotation_mapper.internal.build.AssociationComparator;
 import info.motteke.annotation_mapper.internal.desc.IAssociation;
 import info.motteke.annotation_mapper.internal.desc.IField;
 import info.motteke.annotation_mapper.internal.desc.IMapper;
 import info.motteke.annotation_mapper.internal.desc.IMessage;
 import info.motteke.annotation_mapper.internal.desc.IProperty;
 import info.motteke.annotation_mapper.internal.desc.IType;
-import info.motteke.annotation_mapper.internal.utils.MultiValueMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Association implements IAssociation {
 
@@ -19,11 +22,11 @@ public class Association implements IAssociation {
 
     private final String name;
 
-    private final Map<IProperty, List<IProperty>> keys = new MultiValueMap<IProperty, IProperty>();
+    private final Map<IProperty, Collection<IProperty>> keys = new MultiPropertyMap();
 
-    private final Map<IProperty, List<IProperty>> properties = new MultiValueMap<IProperty, IProperty>();
+    private final Map<IProperty, Collection<IProperty>> properties = new MultiPropertyMap();
 
-    private final List<Association> associations = new ArrayList<Association>();
+    private final Set<Association> associations = new TreeSet<Association>(new AssociationComparator());
 
     private final Association parent;
 
@@ -141,13 +144,19 @@ public class Association implements IAssociation {
     }
 
     @Override
-    public Map<IProperty, List<IProperty>> getKeys() {
-        return new HashMap<IProperty, List<IProperty>>(keys);
+    public Map<IProperty, Collection<IProperty>> getKeys() {
+        Map<IProperty, Collection<IProperty>> keys = new LinkedHashMap<IProperty, Collection<IProperty>>();
+        keys.putAll(this.keys);
+
+        return keys;
     }
 
     @Override
-    public Map<IProperty, List<IProperty>> getProperties() {
-        return new HashMap<IProperty, List<IProperty>>(properties);
+    public Map<IProperty, Collection<IProperty>> getProperties() {
+        Map<IProperty, Collection<IProperty>> properties = new LinkedHashMap<IProperty, Collection<IProperty>>();
+        properties.putAll(this.properties);
+
+        return properties;
     }
 
     @Override

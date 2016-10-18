@@ -266,7 +266,7 @@ public class MapperBuilder {
                     int n = mappings.get(a);
 
                     writer.print(delim);
-                    writer.print("_equals");
+                    writer.print("!_equals");
                     writer.print(n);
 
                     delim = " || ";
@@ -386,6 +386,9 @@ public class MapperBuilder {
                 writer.print(" o2) {");
                 writer.printlnAndIndent();
 
+                writer.print("if (o1 == null || o2 == null) return (o1 == null && o2 == null);");
+                writer.println();
+
                 // compare if not equals
                 for (IProperty property : association.getKeys().keySet()) {
                     writer.print("if (");
@@ -407,7 +410,6 @@ public class MapperBuilder {
                     writer.print("return false;");
                     writer.printlnAndOutdent();
                     writer.print("}");
-                    writer.println();
                     writer.println();
                 }
 

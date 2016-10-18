@@ -1,7 +1,8 @@
 package info.motteke.annotation_mapper.internal.desc.jsr269;
 
-import info.motteke.annotation_mapper.errors.Warnings;
 import info.motteke.annotation_mapper.typical.Flat;
+
+import java.io.File;
 
 import org.seasar.aptina.unit.AptinaTestCase;
 
@@ -10,7 +11,7 @@ public class CompositeProcessorTest extends AptinaTestCase {
     protected void setUp() throws Exception {
         setCharset("UTF-8");
         addOption("-source", "1.6");
-        addSourcePath("src/test/java");
+        addSourcePath("src/test/java", "src/test/java_errors");
 
         CompositeProcessor processor = new CompositeProcessor();
         addProcessor(processor);
@@ -21,12 +22,11 @@ public class CompositeProcessorTest extends AptinaTestCase {
 
         compile();
 
-        System.out.println(getGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper"));
         assertGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper");
     }
 
     public void test_warnings() throws Exception {
-        addCompilationUnit(Warnings.class);
+        addCompilationUnit("info.motteke.annotation_mapper.errors.Warnings");
         compile();
 
         assertFalse(getCompiledResult());
@@ -40,8 +40,8 @@ public class CompositeProcessorTest extends AptinaTestCase {
      * @throws Exception
      */
     private void assertGeneratedSource(String fqn) throws Exception {
-        String resource = fqn.replaceAll("\\.", "/");
+        String resource = fqn.replaceAll("\\.", "/") + ".java";
 
-        assertEqualsGeneratedSourceWithResource(resource, fqn);
+        assertEqualsGeneratedSourceWithFile(new File("src/test/java_mappers", resource), fqn);
     }
 }

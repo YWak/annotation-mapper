@@ -1,22 +1,28 @@
 package info.motteke.annotation_mapper.internal.desc.jsr269;
 
-import info.motteke.annotation_mapper.errors.Warnings;
-import info.motteke.annotation_mapper.typical.Flat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
-import org.seasar.aptina.unit.AptinaTestCase;
+import java.util.List;
 
-public class CompositeProcessorTest extends AptinaTestCase {
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
+import javax.tools.JavaFileObject;
 
-    protected void setUp() throws Exception {
+public class CompositeProcessorTest extends AbstractCompositeProcessorTestCase {
+
+    @Override
+    public void setUp() throws Exception {
         setCharset("UTF-8");
-        addSourcePath("src/test/java");
+        addOption("-source", "1.6");
+        addSourcePath("src/test/java", "src/test/java_errors");
+        addProcessor(new CompositeProcessor());
 
-        CompositeProcessor processor = new CompositeProcessor();
-        addProcessor(processor);
+        setExpectedSourcesDir("src/test/java_mappers");
     }
 
     public void test_typical_pattern() throws Exception {
-        addCompilationUnit(Flat.class);
+        addCompilationUnit("info.motteke.annotation_mapper.typical.Flat");
 
         compile();
 
@@ -24,20 +30,20 @@ public class CompositeProcessorTest extends AptinaTestCase {
     }
 
     public void test_warnings() throws Exception {
-        addCompilationUnit(Warnings.class);
+        addCompilationUnit("info.motteke.annotation_mapper.errors.Warnings");
         compile();
-    }
 
-    /**
-     * 生成されたコードが想定と一致しているかを検証します。
-     *
-     * @param fqn 生成されたコードのFully Qualified Name
-     *
-     * @throws Exception
-     */
-    private void assertGeneratedSource(String fqn) throws Exception {
-        String resource = fqn.replaceAll("\\.", "/");
+        assertFalse(getCompiledResult());
+        List<Diagnostic<? extends JavaFileObject>> diagnostics = getDiagnostics("info.motteke.annotation_mapper.errors.Warnings");
 
-        assertEqualsGeneratedSourceWithResource(resource, fqn);
+        assertThat(diagnostics.size(), is(2));
+        assertThat(diagnostics.get(0), hasKind(Kind.ERROR)
+                                           .line(10)
+                                           .column(5)
+                                           .meessage("@Fieldが値を読み出せない箇所に設定されています。"));
+        assertThat(diagnostics.get(1), hasKind(Kind.ERROR)
+                                           .line(15)
+                                           .column(5)
+                                           .meessage("@Fieldが値を読み出せない箇所に設定されています。"));
     }
 }

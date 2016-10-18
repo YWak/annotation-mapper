@@ -9,12 +9,12 @@ import info.motteke.annotation_mapper.internal.desc.IType;
 import info.motteke.annotation_mapper.internal.utils.jsr269.ElementUtils;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -47,7 +47,7 @@ public class MapperBuilder {
 
     public MapperBuilder(ProcessingEnvironment env) {
         this.env = env;
-        this.mappings = new HashMap<IAssociation, Integer>();
+        this.mappings = new TreeMap<IAssociation, Integer>(new AssociationComparator());
     }
 
     public void setAssociation(IAssociation association) {
@@ -266,7 +266,7 @@ public class MapperBuilder {
                     int n = mappings.get(a);
 
                     writer.print(delim);
-                    writer.print("_equals");
+                    writer.print("!_equals");
                     writer.print(n);
 
                     delim = " || ";
@@ -358,7 +358,7 @@ public class MapperBuilder {
                 int n = mappings.get(association);
                 String instance = "o" + n;
 
-                for (Entry<IProperty, List<IProperty>> entry : association.getProperties().entrySet()) {
+                for (Entry<IProperty, Collection<IProperty>> entry : association.getProperties().entrySet()) {
                     String value = reader("curr", entry.getKey());
 
                     for (IProperty target : entry.getValue()) {
@@ -386,6 +386,9 @@ public class MapperBuilder {
                 writer.print(" o2) {");
                 writer.printlnAndIndent();
 
+                writer.print("if (o1 == null || o2 == null) return (o1 == null && o2 == null);");
+                writer.println();
+
                 // compare if not equals
                 for (IProperty property : association.getKeys().keySet()) {
                     writer.print("if (");
@@ -407,7 +410,6 @@ public class MapperBuilder {
                     writer.print("return false;");
                     writer.printlnAndOutdent();
                     writer.print("}");
-                    writer.println();
                     writer.println();
                 }
 

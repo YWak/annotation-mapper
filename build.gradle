@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "jacoco"
 apply plugin: "eclipse"
 
 // 変数定義
@@ -7,11 +8,22 @@ def defaultEncoding = "UTF-8"
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
+tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
 
 repositories {
     mavenCentral()
     maven {
         url "http://maven.seasar.org/maven2"
+    }
+}
+
+sourceSets {
+    errorsTest {
+        java.srcDir file('src/test/java_errors')
+    }
+    mapperTest {
+        java.srcDir file('src/test/java_mappers')
+        output.classesDir = sourceSets.test.output.classesDir
     }
 }
 
@@ -23,9 +35,46 @@ dependencies {
     testCompile (
         "junit:junit:4.12",
         "org.seasar.aptina:aptina-unit:1.0.0",
-        "com.google.googlejavaformat:google-java-format:1.0",
     )
+
+    mapperTestCompile sourceSets.test.output
+    mapperTestCompile "junit:junit:4.12"
 }
+
+compileTestJava {
+    options.failOnError = false
+}
+
+test {
+    dependsOn compileMapperTestJava
+    reports {
+        html {
+            enabled = true
+            destination = "${buildDir}/reports/tests"
+        }
+        junitXml {
+            enabled = true
+            destination = "${buildDir}/test-results/tests"
+            outputPerTestCase = false
+        }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        sourceSets sourceSets.main
+        xml {
+            enabled = true
+            destination = "${buildDir}/test-results/jacoco/coverage.xml"
+        }
+        html {
+            enabled = true
+            destination = "${buildDir}/reports/jacoco"
+        }
+    }
+}
+
+check.dependsOn += jacocoTestReport
 
 javadoc {
     options {

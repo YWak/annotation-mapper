@@ -23,7 +23,7 @@ public final class FlatMapper {
             boolean _equals3 = equals3(prev, curr);
 
             // create new Object if changes
-            if (_equals1) {
+            if (!_equals1) {
                 o1 = new info.motteke.annotation_mapper.typical.User();
                 mappedValues.add(o1);
                 c2 = new java.util.ArrayList<info.motteke.annotation_mapper.typical.Project>();
@@ -31,13 +31,13 @@ public final class FlatMapper {
 
             }
 
-            if (_equals2 || _equals1) {
+            if (!_equals2 || !_equals1) {
                 o2 = new info.motteke.annotation_mapper.typical.Project();
                 c2.add(o2);
 
             }
 
-            if (_equals3 || _equals2 || _equals1) {
+            if (!_equals3 || !_equals2 || !_equals1) {
                 o3 = new info.motteke.annotation_mapper.typical.User();
                 o2.owner = o3;
 
@@ -47,8 +47,8 @@ public final class FlatMapper {
             // copy values
             o1.id = curr.userId;
             o1.name = curr.getUserName();
-            o2.name = curr.getProjectName();
             o2.id = curr.projectId;
+            o2.name = curr.getProjectName();
             o3.id = curr.userId;
             o3.name = curr.getUserName();
             prev = curr;
@@ -58,26 +58,26 @@ public final class FlatMapper {
     }
 
     private static boolean equals1(info.motteke.annotation_mapper.typical.Flat o1, info.motteke.annotation_mapper.typical.Flat o2) {
+        if (o1 == null || o2 == null) return (o1 == null && o2 == null);
         if (!_equals(o1.userId, o2.userId)) {
             return false;
         }
-
         return true;
     }
 
     private static boolean equals2(info.motteke.annotation_mapper.typical.Flat o1, info.motteke.annotation_mapper.typical.Flat o2) {
+        if (o1 == null || o2 == null) return (o1 == null && o2 == null);
         if (!_equals(o1.projectId, o2.projectId)) {
             return false;
         }
-
         return true;
     }
 
     private static boolean equals3(info.motteke.annotation_mapper.typical.Flat o1, info.motteke.annotation_mapper.typical.Flat o2) {
+        if (o1 == null || o2 == null) return (o1 == null && o2 == null);
         if (!_equals(o1.userId, o2.userId)) {
             return false;
         }
-
         return true;
     }
 

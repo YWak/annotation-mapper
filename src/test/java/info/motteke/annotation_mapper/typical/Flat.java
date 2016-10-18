@@ -28,8 +28,16 @@ public class Flat {
         return userName;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Mapper.Field(property = "projects.name")
     public String getProjectName() {
         return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 }

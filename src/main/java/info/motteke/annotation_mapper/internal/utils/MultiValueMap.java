@@ -3,20 +3,23 @@ package info.motteke.annotation_mapper.internal.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MultiValueMap<K, V> implements Map<K, List<V>> {
+public class MultiValueMap<K, V> implements Map<K, Collection<V>> {
 
-    private final Map<K, List<V>> base;
+    private final Map<K, Collection<V>> base;
 
     public MultiValueMap() {
-        this(new HashMap<K, List<V>>());
+        this(new HashMap<K, Collection<V>>());
     }
 
-    public MultiValueMap(Map<K, List<V>> base) {
+    public MultiValueMap(Map<K, Collection<V>> base) {
         this.base = base;
+    }
+
+    protected Collection<V> newCollection() {
+        return new ArrayList<V>();
     }
 
     @Override
@@ -41,11 +44,11 @@ public class MultiValueMap<K, V> implements Map<K, List<V>> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<V> get(Object key) {
-        List<V> value = base.get(key);
+    public Collection<V> get(Object key) {
+        Collection<V> value = base.get(key);
 
         if (value == null) {
-            value = new ArrayList<V>();
+            value = newCollection();
             base.put((K) key, value);
         }
 
@@ -53,17 +56,17 @@ public class MultiValueMap<K, V> implements Map<K, List<V>> {
     }
 
     @Override
-    public List<V> put(K key, List<V> value) {
+    public Collection<V> put(K key, Collection<V> value) {
         return base.get(key);
     }
 
     @Override
-    public List<V> remove(Object key) {
+    public Collection<V> remove(Object key) {
         return base.remove(key);
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends List<V>> m) {
+    public void putAll(Map<? extends K, ? extends Collection<V>> m) {
         base.putAll(m);
     }
 
@@ -78,12 +81,12 @@ public class MultiValueMap<K, V> implements Map<K, List<V>> {
     }
 
     @Override
-    public Collection<List<V>> values() {
+    public Collection<Collection<V>> values() {
         return base.values();
     }
 
     @Override
-    public Set<java.util.Map.Entry<K, List<V>>> entrySet() {
+    public Set<java.util.Map.Entry<K, Collection<V>>> entrySet() {
         return base.entrySet();
     }
 

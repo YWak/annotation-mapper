@@ -37,8 +37,11 @@ dependencies {
         "org.seasar.aptina:aptina-unit:1.0.0",
     )
 
-    mapperTestCompile sourceSets.test.output
-    mapperTestCompile "junit:junit:4.12"
+    mapperTestCompile (
+        sourceSets.test.output,
+        "junit:junit:4.12",
+        "org.yaml:snakeyaml:1.17",
+    )
 }
 
 compileTestJava {
@@ -105,6 +108,10 @@ eclipse {
                 create resources,  6, '1.0-name-matches-false-false-gradlew*'
             }
         }
+    }
+
+    classpath {
+        plusConfigurations += [ configurations.mapperTestCompile ]
     }
 }
 

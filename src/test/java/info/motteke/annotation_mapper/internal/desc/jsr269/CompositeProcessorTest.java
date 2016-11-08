@@ -36,7 +36,7 @@ public class CompositeProcessorTest extends AbstractCompositeProcessorTestCase {
         assertFalse(getCompiledResult());
         List<Diagnostic<? extends JavaFileObject>> diagnostics = getDiagnostics("info.motteke.annotation_mapper.errors.Warnings");
 
-        assertThat(diagnostics.size(), is(2));
+        assertThat(diagnostics.size(), is(4));
         assertThat(diagnostics.get(0), hasKind(Kind.ERROR)
                                            .line(10)
                                            .column(5)
@@ -45,5 +45,14 @@ public class CompositeProcessorTest extends AbstractCompositeProcessorTestCase {
                                            .line(15)
                                            .column(5)
                                            .meessage("@Fieldが値を読み出せない箇所に設定されています。"));
+    }
+
+    public void test_type_errors() throws Exception {
+        addCompilationUnit("info.motteke.annotation_mapper.errors.TypeErrors");
+        compile();
+
+        assertFalse(getCompiledResult());
+
+        List<Diagnostic<? extends JavaFileObject>> diagnostics = getDiagnostics("info.motteke.annotation_mapper.errors.TypeErrors.From");
     }
 }

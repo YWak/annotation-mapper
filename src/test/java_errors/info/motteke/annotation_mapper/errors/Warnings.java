@@ -16,4 +16,14 @@ public class Warnings {
     public int get() {
         return 0;
     }
+
+    @Field(property = "id2")
+    public long getId() {
+        return 0;
+    }
+
+    @Field(property = "id.id")
+    public long getId2() {
+        return 1;
+    }
 }

@@ -22,13 +22,18 @@ sourceSets {
         java.srcDir file('src/test/java_errors')
     }
     mapperTest {
-        java.srcDir file('src/test/java_mappers')
-        output.classesDir = sourceSets.test.output.classesDir
+        java {
+            srcDir file('src/test/java_mappers')
+            compileClasspath += test.output
+            runtimeClasspath += test.output
+        }
     }
 }
 
 configurations {
     all*.exclude group: "commons-logging"
+
+    mapperTestCompile.extendsFrom testCompile
 }
 
 dependencies {
@@ -38,8 +43,6 @@ dependencies {
     )
 
     mapperTestCompile (
-        sourceSets.test.output,
-        "junit:junit:4.12",
         "org.yaml:snakeyaml:1.17",
     )
 }
@@ -119,5 +122,5 @@ eclipseClasspath.dependsOn += cleanEclipseClasspath
 eclipseProject.dependsOn += cleanEclipseProject
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "2.12"
+    gradleVersion = "3.1"
 }

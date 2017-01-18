@@ -51,6 +51,10 @@ compileTestJava {
     options.failOnError = false
 }
 
+compileMapperTestJava {
+    destinationDir = compileTestJava.destinationDir
+}
+
 test {
     dependsOn compileMapperTestJava
     reports {

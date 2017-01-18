@@ -1,6 +1,7 @@
 apply plugin: "java"
 apply plugin: "jacoco"
 apply plugin: "eclipse"
+apply plugin: "maven"
 
 // 変数定義
 def javaVersion = "1.6"
@@ -9,6 +10,9 @@ def defaultEncoding = "UTF-8"
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
+group = "info.motteke"
+archivesBaseName="annotation-mapper"
+version = new File("src/main/resources/version").text.trim()
 
 repositories {
     mavenCentral()
@@ -124,6 +128,30 @@ eclipse {
 
 eclipseClasspath.dependsOn += cleanEclipseClasspath
 eclipseProject.dependsOn += cleanEclipseProject
+
+// デプロイ用
+// cf. http://sassembla.github.io/Public/12:07:26%2023-19-43/12:07:26%2023-19-43.html
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository (url: "file:${repoDir}")
+        }
+    }
+}
+
+[install.repositories.mavenInstaller, uploadArchives.repositories.mavenDeployer]*.pom*.whenConfigured { pom ->
+    pom.project {
+        inceptionYear '2017'
+        packaging 'jar'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+    }
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = "3.1"

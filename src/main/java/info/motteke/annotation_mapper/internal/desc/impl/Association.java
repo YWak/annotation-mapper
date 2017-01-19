@@ -79,7 +79,7 @@ public class Association implements IAssociation {
             IProperty target = getProperty(association.type, name);
 
             if (target == null) {
-                IMessage message = Message.get().noSuchSetter(association.type.getName(), name);
+                IMessage message = Message.get().noSuchSetter(association.getBeanType().getName(), name);
                 field.getNotifier().error(message);
                 error = true;
                 return;
@@ -141,6 +141,15 @@ public class Association implements IAssociation {
     @Override
     public IType getType() {
         return type;
+    }
+
+    @Override
+    public IType getBeanType() {
+        if (type.getSubType() == null) {
+            return type;
+        } else {
+            return type.getSubType();
+        }
     }
 
     @Override

@@ -338,7 +338,7 @@ public class MapperBuilder {
                         writer.print(">();");
                         writer.println();
 
-                        writer.print(writer(instance, association.getType().getProperty(a.getName()), collection));
+                        writer.print(writer(instance, association.getBeanType().getProperty(a.getName()), collection));
                         writer.print(";");
                         writer.println();
                     }

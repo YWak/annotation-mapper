@@ -137,14 +137,17 @@ public class Jsr269Type implements IType {
 
             if (type == null) {
                 type = new Jsr269Type(name);
-                cache.put(name, type);
-
                 checkCollection(t, type);
 
-                PropertyCollector collector = new PropertyCollector(this);
+                // do not cache collections. subtypes may be different.
+                if (!type.collection) {
+                    cache.put(name, type);
 
-                for (Element e : typeElement.getEnclosedElements()) {
-                    e.accept(collector, type);
+                    PropertyCollector collector = new PropertyCollector(this);
+
+                    for (Element e : typeElement.getEnclosedElements()) {
+                        e.accept(collector, type);
+                    }
                 }
             }
 

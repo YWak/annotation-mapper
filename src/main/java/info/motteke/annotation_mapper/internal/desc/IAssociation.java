@@ -10,6 +10,8 @@ public interface IAssociation {
 
     public IType getType();
 
+    public IType getBeanType();
+
     public Map<IProperty, Collection<IProperty>> getKeys();
 
     public Map<IProperty, Collection<IProperty>> getProperties();

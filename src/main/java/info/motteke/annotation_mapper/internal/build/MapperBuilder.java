@@ -139,9 +139,10 @@ public class MapperBuilder {
         writeMapping();
         writeEquals();
         writeNullSafeEquals();
+        writeHasKey();
         writeConstructor();
 
-        writer.printlnAndOutdent();
+        writer.outdentAndPrintln();
         writer.print("}");
         writer.println();
     }
@@ -182,13 +183,13 @@ public class MapperBuilder {
         writeComparisons();
 
         writer.print("prev = curr;");
-        writer.printlnAndOutdent();
+        writer.outdentAndPrintln();
         writer.print("}");
         writer.println();
         writer.println();
 
         writer.print("return mappedValues;");
-        writer.printlnAndOutdent();
+        writer.outdentAndPrintln();
 
         writer.print("}");
         writer.println();
@@ -252,6 +253,18 @@ public class MapperBuilder {
                 writer.println();
             }
         });
+        handleAssociation(new AssociationHandler(writer, mappings){
+            @Override
+            public void handle(IAssociation association) {
+                int n = mappings.get(association);
+                writer.print("boolean _hasKey");
+                writer.print(n);
+                writer.print(" = hasKey");
+                writer.print(n);
+                writer.print("(curr);");
+                writer.println();
+            }
+        });
 
         writer.println();
         writer.println("// create new Object if changes");
@@ -260,16 +273,33 @@ public class MapperBuilder {
             public void handle(IAssociation association) {
                 writer.print("if (");
 
-                String delim = "";
+                String hasKeyDelim = "";
 
                 for (IAssociation a = association; a != null; a = a.getParent()) {
                     int n = mappings.get(a);
 
-                    writer.print(delim);
+                    writer.print(hasKeyDelim);
+                    writer.print("!_hasKey");
+                    writer.print(n);
+
+                    hasKeyDelim = " || ";
+                }
+
+                writer.print(") continue;");
+                writer.println();
+
+                writer.print("if (");
+
+                String equalsDelim = "";
+
+                for (IAssociation a = association; a != null; a = a.getParent()) {
+                    int n = mappings.get(a);
+
+                    writer.print(equalsDelim);
                     writer.print("!_equals");
                     writer.print(n);
 
-                    delim = " || ";
+                    equalsDelim = " || ";
                 }
 
                 writer.print(") {");
@@ -283,13 +313,7 @@ public class MapperBuilder {
                 int n = mappings.get(association);
                 String instance = "o" + n;
                 IType type = association.getType();
-                IType objectType;
-
-                if (type.getSubType() == null) {
-                    objectType = type;
-                } else {
-                    objectType = type.getSubType();
-                }
+                IType objectType = association.getBeanType();
 
                 writer.print(instance);
 
@@ -344,7 +368,7 @@ public class MapperBuilder {
                     }
                 }
 
-                writer.printlnAndOutdent();
+                writer.outdentAndPrintln();
                 writer.println("}");
                 writer.println();
             }
@@ -358,6 +382,11 @@ public class MapperBuilder {
                 int n = mappings.get(association);
                 String instance = "o" + n;
 
+                writer.print("if (_hasKey");
+                writer.print(n);
+                writer.print(") {");
+                writer.printlnAndIndent();
+
                 for (Entry<IProperty, Collection<IProperty>> entry : association.getProperties().entrySet()) {
                     String value = reader("curr", entry.getKey());
 
@@ -366,6 +395,10 @@ public class MapperBuilder {
                         writer.println(";");
                     }
                 }
+
+                writer.outdentAndPrintln();
+                writer.print("}");
+                writer.println();
             }
         });
     }
@@ -408,7 +441,7 @@ public class MapperBuilder {
                     writer.print(") {");
                     writer.printlnAndIndent();
                     writer.print("return false;");
-                    writer.printlnAndOutdent();
+                    writer.outdentAndPrintln();
                     writer.print("}");
                     writer.println();
                 }
@@ -416,7 +449,47 @@ public class MapperBuilder {
                 writer.print("return true;");
 
                 // end method
-                writer.printlnAndOutdent();
+                writer.outdentAndPrintln();
+                writer.print("}");
+                writer.println();
+                writer.println();
+            }
+        });
+    }
+
+    private void writeHasKey() {
+        handleAssociation(new AssociationHandler(writer, mappings) {
+            @Override
+            public void handle(IAssociation association) {
+                int n = mappings.get(association);
+
+                // declare method
+                writer.print("private static boolean hasKey");
+                writer.print(n);
+                writer.print("(");
+                writer.print(baseClassName);
+                writer.print(" o) {");
+                writer.printlnAndIndent();
+
+                writer.print("assert o != null;");
+                writer.println();
+
+                // compare if not equals
+                for (IProperty property : association.getKeys().keySet()) {
+                    if (property.getType().isPrimitive()) {
+                        continue;
+                    }
+
+                    writer.print("if (");
+                    writer.print(reader("o", property));
+                    writer.print(" == null) return false;");
+                    writer.println();
+                }
+
+                writer.print("return true;");
+
+                // end method
+                writer.outdentAndPrintln();
                 writer.print("}");
                 writer.println();
                 writer.println();
@@ -432,7 +505,7 @@ public class MapperBuilder {
         writer.print("(o1 == null || o2 == null) ?");
         writer.print(" (o1 == null && o2 == null) :");
         writer.print(" o1.equals(o2);");
-        writer.printlnAndOutdent();
+        writer.outdentAndPrintln();
         writer.print("}");
         writer.println();
         writer.println();

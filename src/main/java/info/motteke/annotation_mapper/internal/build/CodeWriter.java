@@ -46,9 +46,9 @@ public class CodeWriter implements Closeable, Flushable {
         level++;
     }
 
-    public void printlnAndOutdent() {
-        println();
+    public void outdentAndPrintln() {
         level--;
+        println();
     }
 
     private void ensureIndent() {

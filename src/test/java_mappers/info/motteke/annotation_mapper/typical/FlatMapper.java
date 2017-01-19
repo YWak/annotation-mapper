@@ -21,8 +21,12 @@ public final class FlatMapper {
             boolean _equals1 = equals1(prev, curr);
             boolean _equals2 = equals2(prev, curr);
             boolean _equals3 = equals3(prev, curr);
+            boolean _hasKey1 = hasKey1(curr);
+            boolean _hasKey2 = hasKey2(curr);
+            boolean _hasKey3 = hasKey3(curr);
 
             // create new Object if changes
+            if (!_hasKey1) continue;
             if (!_equals1) {
                 o1 = new info.motteke.annotation_mapper.typical.User();
                 mappedValues.add(o1);
@@ -31,12 +35,14 @@ public final class FlatMapper {
 
             }
 
+            if (!_hasKey2 || !_hasKey1) continue;
             if (!_equals2 || !_equals1) {
                 o2 = new info.motteke.annotation_mapper.typical.Project();
                 c2.add(o2);
 
             }
 
+            if (!_hasKey3 || !_hasKey2 || !_hasKey1) continue;
             if (!_equals3 || !_equals2 || !_equals1) {
                 o3 = new info.motteke.annotation_mapper.typical.User();
                 o2.owner = o3;
@@ -45,12 +51,21 @@ public final class FlatMapper {
 
 
             // copy values
-            o1.id = curr.userId;
-            o1.name = curr.getUserName();
-            o2.id = curr.projectId;
-            o2.name = curr.getProjectName();
-            o3.id = curr.userId;
-            o3.name = curr.getUserName();
+            if (_hasKey1) {
+                o1.id = curr.userId;
+                o1.name = curr.getUserName();
+
+            }
+            if (_hasKey2) {
+                o2.id = curr.projectId;
+                o2.name = curr.getProjectName();
+
+            }
+            if (_hasKey3) {
+                o3.id = curr.userId;
+                o3.name = curr.getUserName();
+
+            }
             prev = curr;
         }
 
@@ -86,7 +101,26 @@ public final class FlatMapper {
         return (o1 == null || o2 == null) ? (o1 == null && o2 == null) : o1.equals(o2);
     }
 
+    private static boolean hasKey1(info.motteke.annotation_mapper.typical.Flat o) {
+        assert o != null;
+        if (o.userId == null) return false;
+        return true;
+    }
+
+    private static boolean hasKey2(info.motteke.annotation_mapper.typical.Flat o) {
+        assert o != null;
+        if (o.projectId == null) return false;
+        return true;
+    }
+
+    private static boolean hasKey3(info.motteke.annotation_mapper.typical.Flat o) {
+        assert o != null;
+        if (o.userId == null) return false;
+        return true;
+    }
+
     private FlatMapper() { }
 
 
 }
+

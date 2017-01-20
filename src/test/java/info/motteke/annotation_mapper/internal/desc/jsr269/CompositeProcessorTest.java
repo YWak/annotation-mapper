@@ -22,11 +22,11 @@ public class CompositeProcessorTest extends AbstractCompositeProcessorTestCase {
     }
 
     public void test_typical_pattern() throws Exception {
-        addCompilationUnit("info.motteke.annotation_mapper.typical.Flat");
+        addCompilationUnit("info.motteke.annotation_mapper.typical.Flat1");
 
         compile();
 
-        assertGeneratedSource("info.motteke.annotation_mapper.typical.FlatMapper");
+        assertGeneratedSource("info.motteke.annotation_mapper.typical.Flat1Mapper");
     }
 
     public void test_warnings() throws Exception {

@@ -1,0 +1,45 @@
+- !!info.motteke.annotation_mapper.typical.Company
+  id: 1000
+  name: com1
+  president:
+    id: 10
+    name: user1
+  sections:
+    - id: 100
+      name: sec1
+      manager:
+        id: 20
+        name: user2
+      staffs:
+        - id: 30
+          name: user3
+          issues:
+            - id: 1
+              title: issue1
+              owner:
+                id: 30
+                name: user3
+            - id: 2
+              title: issue2
+              owner:
+                id: 30
+                name: user3
+        - id: 40
+          name: user4
+          issues:
+            - id: 3
+              title: issue3
+              owner:
+                id: 40
+                name: user4
+    - id: 200
+      name: sec2
+      staffs:
+        - id: 50
+          name: user5
+          issues:
+            - id: 4
+              title: issue4
+              owner:
+                id: 50
+                name: user5

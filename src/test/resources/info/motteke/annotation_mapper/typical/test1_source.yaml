@@ -1,0 +1,48 @@
+- !!info.motteke.annotation_mapper.typical.Flat1
+  companyId: 1000
+  companyName: com1
+  presidentId: 10
+  presidentName: user1
+  sectionId: 100
+  sectionName: sec1
+  managerId: 20
+  managerName: user2
+  staffId: 30
+  staffName: user3
+  issueId: 1
+- !!info.motteke.annotation_mapper.typical.Flat1
+  companyId: 1000
+  companyName: com1
+  presidentId: 10
+  presidentName: user1
+  sectionId: 100
+  sectionName: sec1
+  managerId: 20
+  managerName: user2
+  staffId: 30
+  staffName: user3
+  issueId: 2
+- !!info.motteke.annotation_mapper.typical.Flat1
+  companyId: 1000
+  companyName: com1
+  presidentId: 10
+  presidentName: user1
+  sectionId: 100
+  sectionName: sec1
+  managerId: 20
+  managerName: user2
+  staffId: 40
+  staffName: user4
+  issueId: 3
+- !!info.motteke.annotation_mapper.typical.Flat1
+  companyId: 1000
+  companyName: com1
+  presidentId: 10
+  presidentName: user1
+  sectionId: 200
+  sectionName: sec2
+  managerId: !!null
+  managerName: !!null
+  staffId: 50
+  staffName: user5
+  issueId: 4

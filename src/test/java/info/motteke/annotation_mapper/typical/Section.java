@@ -2,11 +2,13 @@ package info.motteke.annotation_mapper.typical;
 
 import java.util.List;
 
-public class User {
+public class Section {
 
-    public Long id;
+    public long id;
 
     public String name;
 
-    public List<Issue> issues;
+    public User manager;
+
+    public List<User> staffs;
 }

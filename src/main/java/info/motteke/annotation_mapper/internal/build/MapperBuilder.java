@@ -271,38 +271,21 @@ public class MapperBuilder {
         handleAssociation(new AssociationHandler(writer, mappings) {
             @Override
             public void handle(IAssociation association) {
-                writer.print("if (");
+                writer.print("if (_hasKey");
+                writer.print(mappings.get(association));
+                writer.print(" && (");
 
-                String hasKeyDelim = "";
-
-                for (IAssociation a = association; a != null; a = a.getParent()) {
-                    int n = mappings.get(a);
-
-                    writer.print(hasKeyDelim);
-                    writer.print("!_hasKey");
-                    writer.print(n);
-
-                    hasKeyDelim = " || ";
-                }
-
-                writer.print(") continue;");
-                writer.println();
-
-                writer.print("if (");
-
-                String equalsDelim = "";
+                String delim = "";
 
                 for (IAssociation a = association; a != null; a = a.getParent()) {
-                    int n = mappings.get(a);
-
-                    writer.print(equalsDelim);
+                    writer.print(delim);
                     writer.print("!_equals");
-                    writer.print(n);
+                    writer.print(mappings.get(a));
 
-                    equalsDelim = " || ";
+                    delim = " || ";
                 }
 
-                writer.print(") {");
+                writer.print(")) {");
                 writer.printlnAndIndent();
 
                 // インスタンス更新
@@ -368,25 +351,7 @@ public class MapperBuilder {
                     }
                 }
 
-                writer.outdentAndPrintln();
-                writer.println("}");
-                writer.println();
-            }
-        });
-
-        writer.println();
-        writer.println("// copy values");
-        handleAssociation(new AssociationHandler(writer, mappings) {
-            @Override
-            public void handle(IAssociation association) {
-                int n = mappings.get(association);
-                String instance = "o" + n;
-
-                writer.print("if (_hasKey");
-                writer.print(n);
-                writer.print(") {");
-                writer.printlnAndIndent();
-
+                writer.println("// copy values");
                 for (Entry<IProperty, Collection<IProperty>> entry : association.getProperties().entrySet()) {
                     String value = reader("curr", entry.getKey());
 
@@ -397,7 +362,7 @@ public class MapperBuilder {
                 }
 
                 writer.outdentAndPrintln();
-                writer.print("}");
+                writer.println("}");
                 writer.println();
             }
         });

@@ -46,7 +46,7 @@ public abstract class AbstractBeanUtils<T> {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     public String getName(T method) {

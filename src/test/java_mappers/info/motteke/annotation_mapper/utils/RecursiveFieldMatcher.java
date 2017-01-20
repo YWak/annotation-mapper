@@ -40,23 +40,34 @@ public class RecursiveFieldMatcher<T extends Collection<?>> extends TypeSafeDiag
 
     private boolean matches(Object expected, Object actual, Description desc,
                             LinkedList<Object> stack, Map<Integer, Object> history) {
-        if (expected == null && actual == null) {
-            return true;
-        }
-        if (isPrimitive(expected) && isPrimitive(actual) && expected.equals(actual)) {
-            return true;
-        }
+        check :{
+            if (expected == null && actual == null) {
+                return true;
+            }
+            if (isPrimitive(expected) && isPrimitive(actual)) {
+                if (expected.equals(actual)) {
+                    return true;
+                } else {
+                    break check;
+                }
+            }
 
-        Object old = history.put(System.identityHashCode(expected), actual);
-        if (old != null && old == actual) {
-            return true;
-        }
+            Object old = history.put(System.identityHashCode(expected), actual);
+            if (old != null && old == actual) {
+                if (old == actual) {
+                    return true;
+                } else {
+                    break check;
+                }
+            }
 
-        if (old == null && expected instanceof Collection && actual instanceof Collection) {
-            return matchesCollection((Collection<?>) expected, (Collection<?>) actual, desc, stack, history);
-        }
-        if (old == null && expected != null && actual != null && expected.getClass().equals(actual.getClass())) {
-            return matchesFields(expected, actual, desc, stack, history);
+            if (expected instanceof Collection && actual instanceof Collection) {
+                return matchesCollection((Collection<?>) expected, (Collection<?>) actual, desc, stack, history);
+            }
+
+            if (expected != null && actual != null && expected.getClass().equals(actual.getClass())) {
+                return matchesFields(expected, actual, desc, stack, history);
+            }
         }
 
         desc.appendText("\n");

@@ -15,14 +15,14 @@ public class FlatMapperTest {
 
     @Test
     public void test1() throws Exception {
-        List<Flat1> values = load("test1_source.yaml", Flat1.class);
-        List<Company> expected = load("test1_expected.yaml", Company.class);
+        List<Flat1> values = load("test1_source.yaml");
+        List<Company> expected = load("test1_expected.yaml");
 
         assertThat(Flat1Mapper.map(values), hasSameValues(expected));
     }
 
     @SuppressWarnings("unchecked")
-    private <E> List<E> load(String name, Class<E> clazz) throws IOException {
+    private <E> List<E> load(String name) throws IOException {
         InputStream in = getClass().getResourceAsStream(name);
         try {
             List<E> values = new ArrayList<E>();

@@ -15,12 +15,12 @@
           name: user3
           issues:
             - id: 1
-              title: issue1
+              title: issue-1
               owner:
                 id: 30
                 name: user3
             - id: 2
-              title: issue2
+              title: issue-2
               owner:
                 id: 30
                 name: user3
@@ -28,7 +28,7 @@
           name: user4
           issues:
             - id: 3
-              title: issue3
+              title: issue-3
               owner:
                 id: 40
                 name: user4
@@ -39,7 +39,7 @@
           name: user5
           issues:
             - id: 4
-              title: issue4
+              title: issue-4
               owner:
                 id: 50
                 name: user5

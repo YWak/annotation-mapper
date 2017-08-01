@@ -78,7 +78,7 @@ public class Compiler extends TestWatcher {
      * @throws ClassNotFoundException クラスが見つからなかった場合
      */
     public Class<?> getCompiledClass(String className) throws IllegalStateException, ClassNotFoundException {
-        compiler.assertCompiled();
+        compiler._assertCompiled();
         return javaFileManager.getClassLoader(null).loadClass(className);
     }
 
@@ -156,7 +156,8 @@ public class Compiler extends TestWatcher {
             compilationUnits.clear();
         }
 
-        protected void assertCompiled() throws IllegalStateException {
+        // not @Override
+        protected void _assertCompiled() throws IllegalStateException {
             try {
                 mirror.call("assertCompiled");
             } catch (MirrorOperationException e) {

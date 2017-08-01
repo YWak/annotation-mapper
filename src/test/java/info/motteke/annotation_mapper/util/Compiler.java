@@ -2,8 +2,11 @@ package info.motteke.annotation_mapper.util;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.processing.Processor;
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -28,23 +31,23 @@ public class Compiler extends TestWatcher {
      * @param charset
      */
     public void setCharset(String charset) {
-        compiler.mirror.call("setCharset", charset);
+        compiler.setCharset(charset);
     }
 
     public void addCompilationUnit(String className) {
-        compiler.mirror.call("addCompilationUnit", className);
+        compiler.addCompilationUnit(className);
     }
 
     public void addOption(String... options) {
-        compiler.mirror.callVarArgs("addOption", options);
+        compiler.addOption(options);
     }
 
     public void addProcessor(Processor... processors) {
-        compiler.mirror.callVarArgs("addProcessor", processors);
+        compiler.addProcessor(processors);
     }
 
     public void addSourcePath(String... sourcePaths) {
-        compiler.mirror.callVarArgs("addSourcePath", sourcePaths);
+        compiler.addSourcePath(sourcePaths);
     }
 
     /**
@@ -63,12 +66,7 @@ public class Compiler extends TestWatcher {
      * @throws IllegalStateException コンパイルが実行されていない場合
      */
     public Boolean getCompileResult() throws IllegalStateException {
-        try {
-            return compiler.mirror.call("getCompiledResult");
-        } catch (MirrorOperationException e) {
-            e.throwIfExists(IllegalStateException.class);
-            throw e;
-        }
+        return compiler.getCompiledResult();
     }
 
     /**
@@ -80,26 +78,50 @@ public class Compiler extends TestWatcher {
      * @throws ClassNotFoundException クラスが見つからなかった場合
      */
     public Class<?> getCompiledClass(String className) throws IllegalStateException, ClassNotFoundException {
-        assertCompiled();
-
+        compiler.assertCompiled();
         return javaFileManager.getClassLoader(null).loadClass(className);
+    }
+
+    public <T> void verifyErrorMessage(Class<T> clazz, String message) {
+        verifyErrorMessage(clazz, null, message);
+    }
+
+    public <T> void verifyErrorMessage(Class<T> clazz, Locale locale, String message) {
+        verifyMessage(clazz, Kind.ERROR, locale, message);
+    }
+
+    public <T> void verifyWarningMessage(Class<T> clazz, String message) {
+        verifyWarningMessage(clazz, null, message);
+    }
+
+    public <T> void verifyWarningMessage(Class<T> clazz, Locale locale, String message) {
+        verifyMessage(clazz, Kind.WARNING, locale, message);
+    }
+
+    private <T> void verifyMessage(Class<T> clazz, Kind kind, Locale locale, String message) {
+        for (Diagnostic<? extends JavaFileObject> diagnostic: compiler.getDiagnostics(clazz, kind)) {
+            if (diagnostic.getMessage(locale).equals(message)) {
+                return;
+            }
+        }
+
+        // レベルが違うけど同じメッセージがある？
+        for (Diagnostic<? extends JavaFileObject> diag : compiler.getDiagnostics(clazz)) {
+            if (diag.getMessage(locale).equals(message) && !diag.getKind().equals(kind)) {
+                String detailMessage = "message [" + message + "] exists. but the KIND was [" + diag.getKind() + "]";
+                throw new AssertionError(detailMessage);
+            }
+        }
+
+        throw new AssertionError();
     }
 
     @Override
     protected void finished(Description description) {
         try {
-            compiler.mirror.call("tearDown");
+            compiler.tearDown();
         } catch (Exception e) {
             throw new InternalError();
-        }
-    }
-
-    private void assertCompiled() throws IllegalStateException {
-        try {
-            compiler.mirror.call("assertCompiled");
-        } catch (MirrorOperationException e) {
-            e.throwIfExists(IllegalStateException.class);
-            throw e;
         }
     }
 
@@ -133,5 +155,24 @@ public class Compiler extends TestWatcher {
             List<?> compilationUnits = mirror.get("compilationUnits");
             compilationUnits.clear();
         }
+
+        protected void assertCompiled() throws IllegalStateException {
+            try {
+                mirror.call("assertCompiled");
+            } catch (MirrorOperationException e) {
+                throw e.throwIfExists(IllegalStateException.class);
+            }
+        }
+
+        // 委譲
+        @Override protected void setCharset(String charset) { super.setCharset(charset); }
+        @Override protected void addCompilationUnit(String className) { super.addCompilationUnit(className); }
+        @Override protected void addOption(String... options) { super.addOption(options); }
+        @Override protected void addProcessor(Processor... processors) { super.addProcessor(processors); }
+        @Override protected void addSourcePath(String... sourcePaths) { super.addSourcePath(sourcePaths); }
+        @Override protected Boolean getCompiledResult() throws IllegalStateException { return super.getCompiledResult(); }
+        @Override protected List<Diagnostic<? extends JavaFileObject>> getDiagnostics(Class<?> clazz) { return super.getDiagnostics(clazz); }
+        @Override protected List<Diagnostic<? extends JavaFileObject>> getDiagnostics(Class<?> clazz, Kind kind) { return super.getDiagnostics(clazz, kind); }
+        @Override protected void tearDown() throws Exception { super.tearDown(); }
     }
 }

@@ -18,11 +18,13 @@ public class MirrorOperationException extends RuntimeException {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Throwable> void throwIfExists(Class<T> clazz) throws T {
+    public <T extends Throwable> MirrorOperationException throwIfExists(Class<T> clazz) throws T {
         for (Throwable t = this; t != null; t = t.getCause()) {
             if (clazz.isInstance(t)) {
                 throw (T) t;
             }
         }
+
+        return this;
     }
 }

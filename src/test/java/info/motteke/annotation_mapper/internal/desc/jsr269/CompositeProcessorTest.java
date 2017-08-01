@@ -2,57 +2,37 @@ package info.motteke.annotation_mapper.internal.desc.jsr269;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import info.motteke.annotation_mapper.util.Compiler;
 
-import java.util.List;
+import java.util.Arrays;
 
-import javax.tools.Diagnostic;
-import javax.tools.Diagnostic.Kind;
-import javax.tools.JavaFileObject;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class CompositeProcessorTest extends AbstractCompositeProcessorTestCase {
+public class CompositeProcessorTest {
 
-    @Override
+    @Rule
+    public final Compiler compiler = new Compiler();
+
+    @Before
     public void setUp() throws Exception {
-        setCharset("UTF-8");
-        addOption("-source", "1.6");
-        addSourcePath("src/test/java", "src/test/java_errors");
-        addProcessor(new CompositeProcessor());
-
-        setExpectedSourcesDir("src/test/java_mappers");
+        compiler.setCharset("UTF-8");
+        compiler.addOption("-source", "1.6");
+        compiler.addSourcePath("src/test/java");
+        compiler.addProcessor(new CompositeProcessor());
     }
 
+    @Test
     public void test_typical_pattern() throws Exception {
-        addCompilationUnit("info.motteke.annotation_mapper.typical.Flat1");
+        compiler.addCompilationUnit("info.motteke.annotation_mapper.typical.Flat1");
+        compiler.compile();
 
-        compile();
+        assertThat(compiler.getCompileResult(), is(true));
 
-        assertGeneratedSource("info.motteke.annotation_mapper.typical.Flat1Mapper");
-    }
+        Class<?> clazz = compiler.getCompiledClass("info.motteke.annotation_mapper.typical.Flat1Mapper");
 
-    public void test_warnings() throws Exception {
-        addCompilationUnit("info.motteke.annotation_mapper.errors.Warnings");
-        compile();
-
-        assertFalse(getCompiledResult());
-        List<Diagnostic<? extends JavaFileObject>> diagnostics = getDiagnostics("info.motteke.annotation_mapper.errors.Warnings");
-
-        assertThat(diagnostics.size(), is(4));
-        assertThat(diagnostics.get(0), hasKind(Kind.ERROR)
-                                           .line(10)
-                                           .column(5)
-                                           .meessage("@Fieldが値を読み出せない箇所に設定されています。"));
-        assertThat(diagnostics.get(1), hasKind(Kind.ERROR)
-                                           .line(15)
-                                           .column(5)
-                                           .meessage("@Fieldが値を読み出せない箇所に設定されています。"));
-    }
-
-    public void test_type_errors() throws Exception {
-        addCompilationUnit("info.motteke.annotation_mapper.errors.TypeErrors");
-        compile();
-
-        assertFalse(getCompiledResult());
-
-        List<Diagnostic<? extends JavaFileObject>> diagnostics = getDiagnostics("info.motteke.annotation_mapper.errors.TypeErrors.From");
+        System.out.println(clazz);
+        Arrays.asList(clazz.getMethods()).forEach(System.out::println);
     }
 }

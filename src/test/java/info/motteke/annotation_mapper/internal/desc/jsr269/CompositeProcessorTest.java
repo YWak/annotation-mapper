@@ -2,9 +2,13 @@ package info.motteke.annotation_mapper.internal.desc.jsr269;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import info.motteke.annotation_mapper.typical.Company;
+import info.motteke.annotation_mapper.typical.Flat1;
+import info.motteke.annotation_mapper.util.Beans;
 import info.motteke.annotation_mapper.util.Compiler;
 
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,6 +18,9 @@ public class CompositeProcessorTest {
 
     @Rule
     public final Compiler compiler = new Compiler();
+
+    @Rule
+    public final Beans beans = new Beans();
 
     @Before
     public void setUp() throws Exception {
@@ -31,8 +38,10 @@ public class CompositeProcessorTest {
         assertThat(compiler.getCompileResult(), is(true));
 
         Class<?> clazz = compiler.getCompiledClass("info.motteke.annotation_mapper.typical.Flat1Mapper");
+        List<Flat1> list = beans.loadAll("test1_source.yaml", Flat1.class);
 
-        System.out.println(clazz);
-        Arrays.asList(clazz.getMethods()).forEach(System.out::println);
+        List<Company> actual = (List<Company>) clazz.getMethod("map", Collection.class).invoke(null, list);
+
+        beans.verify(actual, "test1_expected.yaml");
     }
 }
